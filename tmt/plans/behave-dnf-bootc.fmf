@@ -3,9 +3,11 @@ tag: dnf
 
 provision:
   how: virtual
-  image: https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2
+  image: https://download.devel.redhat.com/rhel-9/nightly/RHEL-9/RHEL-9.7.0-20250619.4/compose/BaseOS/x86_64/images/rhel-guest-image-9.7-20250619.4.x86_64.qcow2
 
 prepare:
+- how: shell
+  script: echo -e "[rhel]\nname=rhel\nbaseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/BaseOS/x86_64/os/\nenabled=1\ngpgcheck=0\n\n[rhel-AppStream]\nname=rhel-AppStream\nbaseurl=http://download.devel.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9/compose/AppStream/x86_64/os/\nenabled=1\ngpgcheck=0\n" > /etc/yum.repos.d/rhel-nightly.repo
 - how: install
   package:
   - podman
