@@ -6,7 +6,7 @@ ARG BASE=quay.io/centos-bootc/centos-bootc:stream10
 FROM $BASE
 
 ENV LANG C.UTF-8
-ARG TYPE=nightly
+ARG TYPE=distro
 
 # disable deltas and weak deps
 RUN set -x && \
@@ -23,6 +23,19 @@ COPY ./repos.d/ /etc/yum.repos.d/
 RUN set -x && \
     dnf -y install dnf-plugins-core; \
     dnf -y copr enable rpmsoftwaremanagement/test-utils;
+
+# enable nightlies if requested
+RUN set -x && \
+    if [ "$TYPE" == "nightly" ]; then \
+        dnf -y copr enable rpmsoftwaremanagement/dnf-nightly; \
+        dnf -y repository-packages copr:copr.fedorainfracloud.org:rpmsoftwaremanagement:dnf-nightly upgrade; \
+    fi
+
+RUN set -x && \
+    if [ -n "$COPR" ] && [ -n "$COPR_RPMS" ]; then \
+       dnf -y copr enable $COPR; \
+       dnf -y install $COPR_RPMS; \
+    fi
 
 # Make /opt a symlink to /var/opt. /opt is read-only on bootc systems by default.
 RUN mv /opt /var/opt && ln -sfT /var/opt /opt
