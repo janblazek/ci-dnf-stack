@@ -3,7 +3,6 @@ tag: dnf
 
 provision:
   how: virtual
-  image: https://download.devel.redhat.com/rhel-9/nightly/RHEL-9/RHEL-9.7.0-20250619.4/compose/BaseOS/x86_64/images/rhel-guest-image-9.7-20250619.4.x86_64.qcow2
 
 prepare:
 - how: install
