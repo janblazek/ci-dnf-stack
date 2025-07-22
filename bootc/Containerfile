@@ -58,6 +58,16 @@ RUN set -x && \
     dnf -y builddep /opt/ci/dnf-behave-tests/requirements.spec && \
     pip3 install --prefix /usr -r /opt/ci/dnf-behave-tests/requirements.txt
 
+RUN dnf repolist | grep test-artifacts; \
+    if [ $? -eq 0 ]; then \
+        repoquery --disablerepo=\* --enablerepo=test-artifacts --qf "%{SOURCERPM} %{NAME}" > T-A-pkgs.pkglist; \
+        for P in dnf dnf-plugins-core libdnf libsolv librepo librhsm libmodulemd1 libmodulemd microdnf createrepo_c; do \
+            grep ^$P T-A-pkgs.pkglist | while read line ; do \
+                echo $line | awk '{print $2}' >> T-A-Packages \
+            done \
+        done; \
+        dnf download --destdir rpms/ --disablerepo=\* --enablerepo=test-artifacts `cat T-A-Packages | xargs echo -n`
+
 # install local RPMs if available
 COPY ./rpms/ /opt/ci/rpms/
 RUN rm /opt/ci/rpms/*-{devel,debuginfo,debugsource}*.rpm; \
